@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"embed"
 	"html/template"
 	"log"
@@ -18,30 +19,49 @@ var resources embed.FS
 var t = template.Must(template.ParseFS(resources, "templates/*"))
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
 
+	// Show the web application view and assets 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		data := map[string]string{
-			"Region": os.Getenv("FLY_REGION"),
-		}
-
-		t.ExecuteTemplate(w, "index.html.tmpl", data)
+		t.ExecuteTemplate(w, "index.html.tmpl", nil)
 	})
 
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 
-	// Add a handler for the item lookuup
+	// Add APIs used for the webapplication
 	http.HandleFunc("/item-lookup", ItemLookUpHandler)
 	http.HandleFunc("/get-races", GetRacesHandler)
 	http.HandleFunc("/broken", BrokenHandler)
 
-	log.Println("listening on", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	// Start the server
+	dev := os.Getenv("DEVELOPMENT")
+	port := "8080"
+	if dev == "false" {
+
+		// Start listening on port 80/443 traffic for production build 
+		go func() {
+			log.Println("listening on", "80")
+			log.Fatal(http.ListenAndServe(":80", nil))
+		}()
+
+		// Self-signed certificate jsut for testing
+		certFile := "cert.pem" 
+		keyFile := "key.pem"   
+		httpsServer := &http.Server{
+			Addr: ":443",
+			TLSConfig: &tls.Config{
+				MinVersion: tls.VersionTLS12,
+			},
+		}
+	
+		log.Println("Listening on port 443")
+		log.Fatal(httpsServer.ListenAndServeTLS(certFile, keyFile))
+	} else {	
+		log.Println("listening on", port)
+		log.Fatal(http.ListenAndServe(":"+port, nil))
+	}
+
 }
 
 func ItemLookUpHandler(w http.ResponseWriter, r *http.Request) {
