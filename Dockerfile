@@ -20,11 +20,13 @@ FROM alpine:3.20
 # Install certificates to make HTTPS requests work if needed
 RUN apk --no-cache add ca-certificates
 
-# Set environment variables for the application
-ENV PORT=8080 
+RUN openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes \
+  -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=localhost"
 
 # Set the working directory
 WORKDIR /app
+
+ENV PUBLIC=true
 
 # Copy the built application from the builder stage
 COPY --from=builder /app/model-viewer /app/
@@ -33,7 +35,8 @@ COPY --from=builder /app/model-viewer /app/
 COPY --from=builder /app/templates /app/templates
 
 # Expose the port that the application will listen on
-EXPOSE 8080
+EXPOSE 80
+EXPOSE 443
 
 # Command to run the application
 CMD ["/app/model-viewer"]
