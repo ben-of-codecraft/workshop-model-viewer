@@ -14,7 +14,7 @@
             crossorigin="anonymous"></script>
     
     <!-- Wowhead Model Viewer -->
-    <script src="http://localhost:3000/modelviewer/live/viewer/viewer.min.js"></script>
+    <script src="https://wow.zamimg.com/modelviewer/live/viewer/viewer.min.js"></script>
     <script>
         fetch('/get-races')
         .then(response => {
@@ -262,7 +262,7 @@ Model Viewer
 </div>
 
     <script type="module">
-        window.CONTENT_PATH = `http://localhost:3000/modelviewer/live/`
+        window.CONTENT_PATH = `https://wow.zamimg.com/modelviewer/live/`
         import {generateModels, modelingType} from '/static/index.js';
 
         const character = {
