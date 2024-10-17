@@ -21,7 +21,6 @@ This repository contains a simple web application built with Go that serves a Wo
 The following environment variables can be set to customize the app's behavior:
 
 - `PORT`: The port on which the app will run (default: 8080).
-- `FLY_REGION`: Optional variable to specify the region of the server.
 
 ### Installation
 
@@ -45,6 +44,25 @@ The following environment variables can be set to customize the app's behavior:
     ```
 
 4. Open your browser and navigate to `http://localhost:8080`.
+
+### Running with Docker
+
+To build and run the application locally using Docker, follow these steps:
+
+1. Build the Docker image:
+
+    ```bash
+    docker build -t wow-model-viewer .
+    ```
+
+2. Run the container:
+
+    ```bash
+    docker run -p 8080:8080 --env PORT=8080 --env FLY_REGION=local wow-model-viewer
+    ```
+
+3. Open your browser and navigate to `http://localhost:8080`.
+
 
 ## Endpoints
 
