@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WoW Model Viewer Example</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jQuery is required by the Wowhead Model Viewer -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+            crossorigin="anonymous"></script>
+    
+    <!-- Wowhead Model Viewer -->
+    <script src="http://localhost:3000/modelviewer/live/viewer/viewer.min.js"></script>
+    <script>
+        fetch('/get-races')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Could not get races from api');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Populate the select box with races
+            const raceSelect = document.getElementById('race');
+            raceSelect.innerHTML = ''; // Clear the existing options
+
+            // Loop through the data to create <option> elements
+            for (const [raceName, raceId] of Object.entries(data)) {
+                const option = document.createElement('option');
+                option.value = raceId;
+                option.textContent = raceName;
+                
+                // Optionally, set the default selected race
+                if (raceId === 22) { // Default to Worgen if raceId is 22
+                    option.selected = true;
+                }
+
+                raceSelect.appendChild(option);
+            }
+        })
+        .catch(error => {
+            console.error('There was a problem fetching race data:', error);
+        });
+    </script>
+
+    <!-- Custom Warcraft-themed styles -->
+    <style>
+        body {
+            background-color: #1a1a1a; /* Dark background */
+            font-family: 'Verdana', sans-serif;
+        }
+
+        .warcraft-frame {
+            border: 4px solid rgba(255, 215, 0, 0.8); /* Golden transparent border */
+            border-radius: 10px;
+            background-color: rgba(17, 17, 17, 0.8); /* Dark transparent box */
+            backdrop-filter: blur(10px); /* Blur for a cool transparent effect */
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); /* Red glow */
+            padding: 20px;
+            margin: 20px;
+        }
+
+        .warcraft-frame h1 {
+            color: #ffcc00; /* Golden text */
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent form fields */
+            color: white;
+            border: 2px solid rgba(255, 215, 0, 0.5); /* Golden border */
+            padding: 8px;
+            margin-top: 8px;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .form-label {
+            color: #ffcc00; /* Golden text */
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .submit-btn {
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #cc5200;
+        }
+    </style>
+</head>
+<style>
+    body {
+        background-color: #1a1a1a; /* Dark background */
+        font-family: 'Verdana', sans-serif;
+    }
+
+    .warcraft-frame {
+        border: 4px solid rgba(255, 215, 0, 0.8); /* Golden transparent border */
+        border-radius: 10px;
+        background-color: rgba(17, 17, 17, 0.8); /* Dark transparent box */
+        backdrop-filter: blur(10px); /* Blur for a cool transparent effect */
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); /* Red glow */
+        padding: 20px;
+        margin: 20px;
+    }
+
+    .warcraft-frame h1 {
+        color: #ffcc00; /* Golden text */
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent form fields */
+        color: white;
+        border: 2px solid rgba(255, 215, 0, 0.5); /* Golden border */
+        padding: 8px;
+        margin-top: 8px;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    .form-label {
+        color: #ffcc00; /* Golden text */
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+    }
+
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .submit-btn {
+        background-color: #ff6600;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .submit-btn:hover {
+        background-color: #cc5200;
+    }
+</style>
+</head>
+<body class="bg-black text-white flex flex-col items-center py-10">
+
+    <img src="/static/work.webp" >
+<!-- Title for the page -->
+<h1 class="text-4xl mb-10 text-yellow-500">
+Model Viewer
+</h1>
+
+<!-- Side-by-Side Layout for Character and Item Viewers -->
+<div class="flex space-x-8 justify-center">
+    <!-- Character Viewer -->
+    <div class="warcraft-frame w-[500px]">
+        <h1>Character Viewer</h1>
+        <div id="model_3d" class="w-full h-96"></div> <!-- Character viewer area -->
+        
+        <!-- Character Customization Form -->
+        <form id="character-form" class="form-container">
+            <!-- Race Selector -->
+            <div>
+                <label for="race" class="form-label">Select Race:</label>
+                <select id="race" class="form-control">
+                    <option value="7">Gnome</option>
+                    <option value="1">Human</option>
+                    <option value="2">Orc</option>
+                    <option value="3">Dwarf</option>
+                    <option value="10">Blood Elf</option>
+                    <option value="22" selected>Worgen</option>
+                </select>
+            </div>
+
+            <!-- Gender Selector -->
+            <div>
+                <label for="gender" class="form-label">Select Gender:</label>
+                <select id="gender" class="form-control">
+                    <option value="0">Male</option>
+                    <option value="1" selected>Female</option>
+                </select>
+            </div>
+
+            <!-- Hair Style Selector -->
+            <div>
+                <label for="hairstyle" class="form-label">Select Hair Style:</label>
+                <select id="hairstyle" class="form-control">
+                    <option value="1" selected>Style 1</option>
+                    <option value="2">Style 2</option>
+                    <option value="3">Style 3</option>
+                </select>
+            </div>
+            
+            <!-- Submit Button -->
+            <button id="character-btn" type="button" class="submit-btn mt-4">Display Character</button>
+        </form>
+    </div>
+
+    <!-- Item Viewer -->
+    <div class="warcraft-frame w-[500px]">
+        <h1>Item Viewer</h1>
+        <div id="model_3d2" class="w-full h-96"></div> <!-- Item viewer area -->
+
+        <!-- Item Display ID Form -->
+        <form id="item-form" class="form-container">
+            <label for="item_id" class="form-label">Select Item:</label>
+                <select id="item_id" class="form-control">
+                    <option value="48406">Relentless Gladiator's Claymore</option>
+                    <option value="51936">Citadel Enforcer's Claymore</option>
+                    <option value="47737">Reckoning</option>
+                    <option value="42331">Hateful Gladiator's Greatsword</option>
+                    <option value="42334">Relentless Gladiator's Greatsword</option>
+                    <option value="49299">Keen Obsidian Edged Blade</option>
+                    <option value="47951" selected>Reckoning</option>
+                    <option value="51392">Wrathful Gladiator's Greatsword</option>
+                    <option value="45950">Furious Gladiator's Claymore</option>
+                    <option value="50048">Quel'Delar, Might of the Faithful</option>
+                    <option value="51393">Wrathful Gladiator's Claymore</option>
+                    <option value="47515">Decimation</option>
+                    <option value="48023">Edge of Agony</option>
+                    <option value="50070">Glorenzelg, High-Blade of the Silver Hand</option>
+                    <option value="50049">Quel'Delar, Ferocity of the Scorned</option>
+                    <option value="42332">Deadly Gladiator's Greatsword</option>
+                    <option value="47516">Fleshrender</option>
+                    <option value="47884">Edge of Agony</option>
+                    <option value="45868">Aesir's Edge</option>
+                    <option value="45516">Voldrethar, Dark Blade of Oblivion</option>
+                </select>
+            <button id="item-btn" type="button" class="submit-btn">Display Item</button>
+        </form>
+    </div>
+</div>
+
+    <script type="module">
+        window.CONTENT_PATH = `http://localhost:3000/modelviewer/live/`
+        import {generateModels, modelingType} from '/static/index.js';
+
+        const character = {
+            "race": 22,  
+            "gender": 1,  
+            "skin": 2,
+            "face": 1,
+            "hairStyle": 1,
+            "hairColor": 2,
+            "facialStyle": 1,
+            "items": [
+                [1, 685355], [3, 63609], [5, 63611], [6, 25235], [7, 63613], 
+                [8, 21154], [9, 14618], [10, 63616], [21, 677121], [22, 57003]
+            ]
+        };
+
+        // Sets a new item
+        document.getElementById('item-btn').addEventListener('click', async (event) => {
+            event.preventDefault();
+            console.log('Item form submitted');
+
+            const item_id = document.getElementById('item_id').value;
+
+            fetch(`/item-lookup?item=${item_id}`)
+                .then(response => response.json())
+                .then(async data => {
+                    document.getElementById('model_3d2').innerHTML = '';
+                    window.model2 = await generateModels(1, `#model_3d2`, { type: modelingType.ITEM, id: data.displayId });
+                });
+        }); 
+        
+        // on character button click
+        document.getElementById('character-btn').addEventListener('click', async (event) => {
+            event.preventDefault();
+
+            document.getElementById('model_3d').innerHTML = '';
+            const raceId = document.getElementById("race").value;
+            const gender = document.getElementById("gender").value;
+            const hairstyle = document.getElementById("hairstyle").value;
+
+            character.race = parseInt(raceId);
+            character.gender = parseInt(gender);
+            character.hairStyle = +hairstyle;
+
+            window.model1 = await generateModels(1, `#model_3d`, character);
+        }); 
+        
+        window.model1 = await generateModels(1, `#model_3d`, character);
+        window.model2 = await generateModels(1, `#model_3d2`, {type: modelingType.ITEM, id: 60608});
+
+    </script>
+</body>
+</html>
