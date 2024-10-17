@@ -1,4 +1,4 @@
-# WoW Model Viewer Example
+# WWorkShop Sample Application  (Model Viewer) 
 
 This repository contains a simple web application built with Go that serves a World of Warcraft (WoW) model viewer. The application allows users to view WoW character models and item models using embedded templates and static resources.
 
