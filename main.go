@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"sync"
 	"time"
 
 
@@ -30,8 +29,6 @@ var client = &http.Client{
 
 // Define a semaphore to limit concurrent requests
 var semaphore = make(chan struct{}, 10) // Limit to 10 concurrent requests
-var wg sync.WaitGroup                // WaitGroup to wait for goroutines to finish
-
 
 func main() {
 
