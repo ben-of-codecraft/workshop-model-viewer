@@ -99,12 +99,13 @@ function getCharacterOptions(character, fullOptions) {
             optionId: part.Id,
             choiceId: (characterPart()[prop]) ? optionalChaining(part.Choices[character[characterPart()[prop]]]) : part.Choices[0].Id
         }
+
         if(newOption.choiceId === undefined) {
             missingChoice.push(characterPart()[prop])
         }
         ret.push(newOption)
     }
-    if(missingChoice) {
+    if(missingChoice.length) {
         console.warn(`In character: `, character, `the following options are missing`, missingChoice)
     }
 

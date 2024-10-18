@@ -2,21 +2,36 @@ package main
 
 import (
 	"crypto/tls"
+	"compress/gzip"
+	"compress/flate"
+	"context"
 	"embed"
+	"encoding/json"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"encoding/json"
+	"sync"
+	"time"
+
 
 	"github.com/ben-of-codecraft/workshop-model-viewer/items"
 )
-
 //go:embed templates/*
 var resources embed.FS
 
 var t = template.Must(template.ParseFS(resources, "templates/*"))
+
+var client = &http.Client{
+	Timeout: 10 * time.Second, // Set a timeout for requests
+}
+
+// Define a semaphore to limit concurrent requests
+var semaphore = make(chan struct{}, 10) // Limit to 10 concurrent requests
+var wg sync.WaitGroup                // WaitGroup to wait for goroutines to finish
+
 
 func main() {
 
@@ -28,11 +43,11 @@ func main() {
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-
 	// Add APIs used for the webapplication
 	http.HandleFunc("/item-lookup", ItemLookUpHandler)
 	http.HandleFunc("/get-races", GetRacesHandler)
 	http.HandleFunc("/broken", BrokenHandler)
+	http.HandleFunc("/proxy/", ProxyHandler)
 
 	// Start the server
 	dev := os.Getenv("DEVELOPMENT")
@@ -145,4 +160,77 @@ func GetRacesHandler(w http.ResponseWriter, r *http.Request) {
 
 func BrokenHandler(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "something terrible has happened", http.StatusInternalServerError)
+}
+func ProxyHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Build the target URL
+	targetURL := "https://wow.zamimg.com/modelviewer/live/" + r.URL.Path[len("/proxy/"):]
+
+	// Create a new request to the target URL
+	req, err := http.NewRequest(http.MethodGet, targetURL, nil)
+	if err != nil {
+		http.Error(w, "Error creating request", http.StatusInternalServerError)
+		return
+	}
+
+	// Forward original request headers
+	for key, values := range r.Header {
+		for _, value := range values {
+			req.Header.Add(key, value)
+		}
+	}
+
+	// Set Accept header to request JSON
+	req.Header.Set("Accept", "application/json")
+
+	// Use context to handle timeout
+	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+	defer cancel()
+	req = req.WithContext(ctx)
+
+	// Limit concurrent requests
+	semaphore <- struct{}{} // Acquire a token
+	defer func() {
+		<-semaphore // Release the token
+	}()
+
+	// Perform the request
+	resp, err := client.Do(req)
+	if err != nil {
+		http.Error(w, "Error fetching data from external API", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Set CORS headers
+	w.Header().Set("Access-Control-Allow-Origin", "*") // Allow all origins
+	w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+	w.WriteHeader(resp.StatusCode)
+
+	// Determine the appropriate reader based on Content-Encoding
+	var reader io.Reader = resp.Body
+	switch resp.Header.Get("Content-Encoding") {
+	case "gzip":
+		gzipReader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			http.Error(w, "Error creating gzip reader", http.StatusInternalServerError)
+			return
+		}
+		defer gzipReader.Close()
+		reader = gzipReader
+	case "deflate":
+		flateReader := flate.NewReader(resp.Body)
+		defer flateReader.Close()
+		reader = flateReader
+	}
+
+	// Stream the response directly to the client
+	if _, err := io.Copy(w, reader); err != nil {
+		http.Error(w, "Error copying response to client", http.StatusInternalServerError)
+		return
+	}
 }

@@ -1,11 +1,9 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WoW Model Viewer Example</title>
     
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- jQuery is required by the Wowhead Model Viewer -->
@@ -24,17 +22,17 @@
             return response.json();
         })
         .then(data => {
-            // Populate the select box with races
-            const raceSelect = document.getElementById('race');
-            raceSelect.innerHTML = ''; // Clear the existing options
 
-            // Loop through the data to create <option> elements
+            const raceSelect = document.getElementById('race');
+            raceSelect.innerHTML = ''; 
+
+  
             for (const [raceName, raceId] of Object.entries(data)) {
                 const option = document.createElement('option');
                 option.value = raceId;
                 option.textContent = raceName;
                 
-                // Optionally, set the default selected race
+
                 if (raceId === 22) { // Default to Worgen if raceId is 22
                     option.selected = true;
                 }
@@ -47,25 +45,24 @@
         });
     </script>
 
-    <!-- Custom Warcraft-themed styles -->
     <style>
         body {
-            background-color: #1a1a1a; /* Dark background */
+            background-color: #1a1a1a; 
             font-family: 'Verdana', sans-serif;
         }
 
         .warcraft-frame {
-            border: 4px solid rgba(255, 215, 0, 0.8); /* Golden transparent border */
+            border: 4px solid rgba(255, 215, 0, 0.8); 
             border-radius: 10px;
-            background-color: rgba(17, 17, 17, 0.8); /* Dark transparent box */
-            backdrop-filter: blur(10px); /* Blur for a cool transparent effect */
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); /* Red glow */
+            background-color: rgba(17, 17, 17, 0.8); 
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); 
             padding: 20px;
             margin: 20px;
         }
 
         .warcraft-frame h1 {
-            color: #ffcc00; /* Golden text */
+            color: #ffcc00; 
             text-align: center;
             font-size: 2rem;
             margin-bottom: 20px;
@@ -74,7 +71,7 @@
         .form-control {
             background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent form fields */
             color: white;
-            border: 2px solid rgba(255, 215, 0, 0.5); /* Golden border */
+            border: 2px solid rgba(255, 215, 0, 0.5); 
             padding: 8px;
             margin-top: 8px;
             border-radius: 5px;
@@ -82,7 +79,7 @@
         }
 
         .form-label {
-            color: #ffcc00; /* Golden text */
+            color: #ffcc00; 
             font-size: 1.2rem;
             margin-bottom: 5px;
         }
@@ -108,86 +105,49 @@
         .submit-btn:hover {
             background-color: #cc5200;
         }
-    </style>
-</head>
-<style>
-    body {
-        background-color: #1a1a1a; /* Dark background */
-        font-family: 'Verdana', sans-serif;
-    }
 
-    .warcraft-frame {
-        border: 4px solid rgba(255, 215, 0, 0.8); /* Golden transparent border */
-        border-radius: 10px;
-        background-color: rgba(17, 17, 17, 0.8); /* Dark transparent box */
-        backdrop-filter: blur(10px); /* Blur for a cool transparent effect */
-        box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); /* Red glow */
-        padding: 20px;
-        margin: 20px;
-    }
+        .loading-circle {
+            border: 8px solid rgba(255, 255, 255, 0.1);
+            border-top: 8px solid #ffcc00; 
+            border-radius: 70%;
+            width: 200px;
+            height: 200px; 
+            animation: spin 1.0s ease infinite;
+            position: absolute;
+            top: 120px; 
+            z-index: 10; 
+        }
 
-    .warcraft-frame h1 {
-        color: #ffcc00; /* Golden text */
-        text-align: center;
-        font-size: 2rem;
-        margin-bottom: 20px;
-    }
+        #loading-spinner {
+            position: relative;
+        }
 
-    .form-control {
-        background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent form fields */
-        color: white;
-        border: 2px solid rgba(255, 215, 0, 0.5); /* Golden border */
-        padding: 8px;
-        margin-top: 8px;
-        border-radius: 5px;
-        width: 100%;
-    }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-    .form-label {
-        color: #ffcc00; /* Golden text */
-        font-size: 1.2rem;
-        margin-bottom: 5px;
-    }
-
-    .form-container {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-    .submit-btn {
-        background-color: #ff6600;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        font-size: 1rem;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .submit-btn:hover {
-        background-color: #cc5200;
-    }
 </style>
 </head>
 <body class="bg-black text-white flex flex-col items-center py-10">
 
     <img src="/static/work.webp" >
-<!-- Title for the page -->
+
 <h1 class="text-4xl mb-10 text-yellow-500">
 Model Viewer
 </h1>
 
-<!-- Side-by-Side Layout for Character and Item Viewers -->
+
 <div class="flex space-x-8 justify-center">
     <!-- Character Viewer -->
+
     <div class="warcraft-frame w-[500px]">
         <h1>Character Viewer</h1>
-        <div id="model_3d" class="w-full h-96"></div> <!-- Character viewer area -->
-        
-        <!-- Character Customization Form -->
+        <div id="loading-spinner" class="hidden flex justify-center items-center">
+            <div class="loading-circle"></div>
+        </div>
+        <div id="model_3d" class="w-full h-96"></div> 
+
         <form id="character-form" class="form-container">
             <!-- Race Selector -->
             <div>
@@ -220,8 +180,15 @@ Model Viewer
                     <option value="3">Style 3</option>
                 </select>
             </div>
+
+            <div>
+                <label for="equipment" class="form-label">Show Equipment:</label>
+                <select id="equipment" class="form-control">
+                    <option value="yes" selected>Yes</option>
+                    <option value="no">No</option>                    
+                </select>                 
+            </div>
             
-            <!-- Submit Button -->
             <button id="character-btn" type="button" class="submit-btn mt-4">Display Character</button>
         </form>
     </div>
@@ -237,7 +204,6 @@ Model Viewer
                 <select id="item_id" class="form-control">
                     <option value="48406">Relentless Gladiator's Claymore</option>
                     <option value="51936">Citadel Enforcer's Claymore</option>
-                    <option value="47737">Reckoning</option>
                     <option value="42331">Hateful Gladiator's Greatsword</option>
                     <option value="42334">Relentless Gladiator's Greatsword</option>
                     <option value="49299">Keen Obsidian Edged Blade</option>
@@ -257,13 +223,20 @@ Model Viewer
                     <option value="45516">Voldrethar, Dark Blade of Oblivion</option>
                 </select>
             <button id="item-btn" type="button" class="submit-btn">Display Item</button>
+            <button id="item-equip-btn" type="button" class="submit-btn">Equip On Model</button>
         </form>
     </div>
 </div>
 
     <script type="module">
-        window.CONTENT_PATH = `https://wow.zamimg.com/modelviewer/live/`
+        window.CONTENT_PATH = `/proxy/`;
         import {generateModels, modelingType} from '/static/index.js';
+
+        let weapon = 60608; // default weapon showns
+        let gear = [
+            [1, 685355], [3, 63609], [5, 63611], [6, 25235], [7, 63613], 
+            [8, 21154], [9, 14618], [10, 63616], [21, 677121], [22, 57003]
+        ];
 
         const character = {
             "race": 22,  
@@ -273,16 +246,34 @@ Model Viewer
             "hairStyle": 1,
             "hairColor": 2,
             "facialStyle": 1,
-            "items": [
-                [1, 685355], [3, 63609], [5, 63611], [6, 25235], [7, 63613], 
-                [8, 21154], [9, 14618], [10, 63616], [21, 677121], [22, 57003]
-            ]
+            "items": gear 
         };
+        
+        // Generate the intial models to show
+        window.model1 = await generateModels(1, `#model_3d`, character);
+        window.model2 = await generateModels(1, `#model_3d2`, {type: modelingType.ITEM, id: 60608});
 
-        // Sets a new item
+        try {
+            window.model1.onComplete(() => {
+           console.log("here"); 
+        });
+        
+        } catch(e) {
+
+        }
+        
+        try {
+            window.model1.onRenderComplete(() => {
+           console.log("here 2"); 
+        });
+        
+        } catch(e) {
+            
+        }
+
+        // Display a new item model in the viewer window. 
         document.getElementById('item-btn').addEventListener('click', async (event) => {
-            event.preventDefault();
-            console.log('Item form submitted');
+            event.preventDefault();            
 
             const item_id = document.getElementById('item_id').value;
 
@@ -290,28 +281,87 @@ Model Viewer
                 .then(response => response.json())
                 .then(async data => {
                     document.getElementById('model_3d2').innerHTML = '';
+                    weapon = data.displayId;
                     window.model2 = await generateModels(1, `#model_3d2`, { type: modelingType.ITEM, id: data.displayId });
                 });
         }); 
         
-        // on character button click
+        // Display a new character model in viewer window. 
         document.getElementById('character-btn').addEventListener('click', async (event) => {
             event.preventDefault();
 
-            document.getElementById('model_3d').innerHTML = '';
-            const raceId = document.getElementById("race").value;
-            const gender = document.getElementById("gender").value;
-            const hairstyle = document.getElementById("hairstyle").value;
-
-            character.race = parseInt(raceId);
-            character.gender = parseInt(gender);
-            character.hairStyle = +hairstyle;
-
-            window.model1 = await generateModels(1, `#model_3d`, character);
+            updateModel(true);
         }); 
         
-        window.model1 = await generateModels(1, `#model_3d`, character);
-        window.model2 = await generateModels(1, `#model_3d2`, {type: modelingType.ITEM, id: 60608});
+        
+        // Change the weapon on the character based on current item shown. 
+        document.getElementById('item-equip-btn').addEventListener('click', equipWeapon);
+        document.getElementById('equipment').addEventListener('change', setEquipment);
+
+        // Set the equipment on or off based on the select box
+        function setEquipment() {
+            const equipment = document.getElementById('equipment').value;
+            if( equipment === 'no') {
+                getNaked();
+            } else {
+                getDressed();
+            }
+        }
+
+        function equipWeapon() {
+
+            const equipment = document.getElementById('equipment').value;
+            if( equipment === 'no') {
+                character.items = [[21, weapon]];                
+            } else {
+                gear = [
+                    [1, 685355], [3, 63609], [5, 63611], [6, 25235], [7, 63613], 
+                    [8, 21154], [9, 14618], [10, 63616], [21, weapon], [22, 57003]
+                ];
+                character.items = gear;                                 
+            }  
+            
+            window.model1.updateItemViewer(21, weapon);
+        }
+
+        // Main Character model updater will destroy then recreate to save memory
+        async function updateModel(all = false) {
+            document.getElementById('model_3d').innerHTML = '';
+            showLoadingSpinner();
+            const raceId = document.getElementById("race").value;
+            const gender = document.getElementById("gender").value;
+            const hairstyle = document.getElementById("hairstyle").value;            
+
+            await window.model1.destroy();
+
+            character.hairStyle = +hairstyle;
+            character.race = +raceId;
+            character.gender = +gender;
+
+            setTimeout(hideLoadingSpinner, 1000); 
+            window.model1 = await generateModels(1, `#model_3d`, character);
+        }
+
+        // Toss off the gear
+        function getNaked() {
+            gear.forEach(item => {                
+                window.model1.updateItemViewer(item[0], null);
+            });
+        } 
+
+        // Make model wear gear again
+        function getDressed() {
+            gear.forEach(item => {                
+                window.model1.updateItemViewer(item[0], item[1]);
+            });
+        }
+
+        function showLoadingSpinner() {
+            $('#loading-spinner').removeClass('hidden');            
+        }
+        function hideLoadingSpinner() {
+            $('#loading-spinner').addClass('hidden');            
+        }
 
     </script>
 </body>

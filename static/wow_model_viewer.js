@@ -3,6 +3,7 @@ import {getCharacterOptions} from "./character_modeling.js"
 
 // eslint-disable-next-line no-undef
 class WowModelViewer extends ZamModelViewer {
+
     /**
      * Returns the list of animation names
      * @returns {Array.<string>}
@@ -102,10 +103,12 @@ class WowModelViewer extends ZamModelViewer {
         if(!this.currentCharacterOptions) {
             throw Error(`Character options are not set`)
         }
+
         const characterOptions = getCharacterOptions(options, this.currentCharacterOptions)
         const race = this.characterRace
         const gender = this.characterGender
-        this.method(`setAppearance`, {race: race, gender: gender, options: characterOptions})
+        console.log(characterOptions); 
+        this.method(`setAppearance`, {race: 3, gender: 1, options: characterOptions})
     }
 }
 
